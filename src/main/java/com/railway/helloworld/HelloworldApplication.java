@@ -50,7 +50,7 @@ public class HelloworldApplication {
                 "modules": [
                     {
                         "name": "extension_pagos_servicios",
-                        "version": 1,
+                        "version": 2,
                         "url": "https://tconectahost.netlify.app/modules/extension_pagos_servicios-debug.apk",
                         "size": 425984,
                         "description": "Módulo dinámico con funcionalidades adicionales",
