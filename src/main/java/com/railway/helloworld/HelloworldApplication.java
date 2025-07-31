@@ -49,7 +49,7 @@ public class HelloworldApplication {
                 "version": 1,
                 "modules": [
                     {
-                        "name": "extension_pagos_servicios",
+                        "name": "extension_pagos_servicios_s",
                         "version": 2,
                         "url": "https://tconectahost.netlify.app/modules/extension_pagos_servicios-debug.apk",
                         "size": 425984,
@@ -93,7 +93,7 @@ public class HelloworldApplication {
             {
                 "available_modules": [
                     {
-                        "name": "extension_pagos_servicios",
+                        "name": "extension_pagos_servicios_s",
                         "status": "available",
                         "download_url": "https://tconectahost.netlify.app/modules/extension_pagos_servicios-debug.apk"
                     }
