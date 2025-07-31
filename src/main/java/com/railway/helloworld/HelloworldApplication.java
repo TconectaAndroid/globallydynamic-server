@@ -106,4 +106,67 @@ public class HelloworldApplication {
             .header(HttpHeaders.CONTENT_TYPE, "application/json")
             .body(response);
     }
+
+    // Endpoint que GloballyDynamic usa para descargar módulos
+@PostMapping("/download")
+public ResponseEntity<byte[]> downloadModule(
+        @RequestParam("variant") String variant,
+        @RequestParam("version") String version,
+        @RequestParam("application-id") String applicationId,
+        @RequestParam(value = "features", required = false) String features,
+        @RequestBody(required = false) String deviceSpec) {
+    
+    System.out.println("=== GloballyDynamic Download Request ===");
+    System.out.println("Variant: " + variant);
+    System.out.println("Version: " + version);
+    System.out.println("App ID: " + applicationId);
+    System.out.println("Features: " + features);
+    
+    try {
+        // Aquí simularemos devolver el APK desde Netlify
+        // En producción, deberías descargar el archivo real
+        String apkUrl = "https://tconectahost.netlify.app/modules/extension_pagos_servicios-debug.apk";
+        
+        // Por ahora, devolvemos una respuesta simulada
+        // TODO: Implementar descarga real del APK
+        byte[] apkData = "APK_DATA_PLACEHOLDER".getBytes();
+        
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_TYPE, "application/zip")
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=splits.zip")
+            .body(apkData);
+            
+    } catch (Exception e) {
+        System.err.println("Error en download: " + e.getMessage());
+        return ResponseEntity.status(500).build();
+    }
+}
+
+// Endpoint para subir bundles (desarrollo)
+@PostMapping("/upload")
+public ResponseEntity<String> uploadBundle(@RequestBody(required = false) byte[] bundleData) {
+    System.out.println("=== Upload Bundle Request ===");
+    
+    // Simular upload exitoso
+    String response = """
+        {
+            "status": "success",
+            "message": "Bundle uploaded successfully",
+            "timestamp": "%s"
+        }
+        """.formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+    
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .body(response);
+}
+
+// Endpoint para verificar si el servidor está corriendo
+@GetMapping("/liveness_check")
+public ResponseEntity<String> livenessCheck() {
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_TYPE, "text/plain")
+        .body("OK");
+}
+    
 }
