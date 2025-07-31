@@ -44,21 +44,29 @@ public class HelloworldApplication {
     public ResponseEntity<String> getModulesMetadata() {
         System.out.println("=== Solicitando metadata de módulos ===");
         
-        String jsonResponse = """
-            {
-                "version": 1,
-                "modules": [
-                    {
-                        "name": "extension_pagos_servicios_s",
-                        "version": 2,
-                        "url": "https://tconectahost.netlify.app/modules/extension_pagos_servicios-debug.apk",
-                        "size": 425984,
-                        "description": "Módulo dinámico con funcionalidades adicionales",
-                        "minAppVersion": 1
-                    }
-                ]
-            }
-            """;
+       String jsonResponse = """
+        {
+            "version": 1,
+            "modules": [
+                {
+                    "name": "installtimefeature",
+                    "version": 1,
+                    "url": "https://tconectahost.netlify.app/modules/installtimefeature.apk",
+                    "size": 425984,
+                    "description": "Módulo dinámico install-time",
+                    "minAppVersion": 1
+                },
+                {
+                    "name": "ondemandfeature",
+                    "version": 1,
+                    "url": "https://tconectahost.netlify.app/modules/ondemandfeature.apk",
+                    "size": 453660,
+                    "description": "Módulo dinámico on-demand",
+                    "minAppVersion": 1
+                }
+            ]
+        }
+        """;
         
         System.out.println("✓ Metadata devuelta exitosamente");
         
