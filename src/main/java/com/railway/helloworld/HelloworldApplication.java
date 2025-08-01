@@ -49,19 +49,11 @@ public class HelloworldApplication {
             "version": 1,
             "modules": [
                 {
-                    "name": "installtimefeature",
+                    "name": "dynamicfeature-debug",
                     "version": 1,
-                    "url": "https://tconectahost.netlify.app/modules/installtimefeature.apk",
-                    "size": 425984,
-                    "description": "Módulo dinámico install-time",
-                    "minAppVersion": 1
-                },
-                {
-                    "name": "ondemandfeature",
-                    "version": 1,
-                    "url": "https://tconectahost.netlify.app/modules/ondemandfeature.apk",
-                    "size": 453660,
-                    "description": "Módulo dinámico on-demand",
+                    "url": "https://tconectahost.netlify.app/modules/dynamicfeature-debug.apk",
+                    "size": 5952532,
+                    "description": "Módulo dinámico con funcionalidades adicionales",
                     "minAppVersion": 1
                 }
             ]
@@ -101,9 +93,9 @@ public class HelloworldApplication {
             {
                 "available_modules": [
                     {
-                        "name": "extension_pagos_servicios_s",
+                        "name": "dynamicfeature-debug",
                         "status": "available",
-                        "download_url": "https://tconectahost.netlify.app/modules/extension_pagos_servicios-debug.apk"
+                        "download_url": "https://tconectahost.netlify.app/modules/dynamicfeature-debug.apk"
                     }
                 ],
                 "total_count": 1
@@ -116,65 +108,73 @@ public class HelloworldApplication {
     }
 
     // Endpoint que GloballyDynamic usa para descargar módulos
-@PostMapping("/download")
-public ResponseEntity<byte[]> downloadModule(
-        @RequestParam("variant") String variant,
-        @RequestParam("version") String version,
-        @RequestParam("application-id") String applicationId,
-        @RequestParam(value = "features", required = false) String features,
-        @RequestBody(required = false) String deviceSpec) {
-    
-    System.out.println("=== GloballyDynamic Download Request ===");
-    System.out.println("Variant: " + variant);
-    System.out.println("Version: " + version);
-    System.out.println("App ID: " + applicationId);
-    System.out.println("Features: " + features);
-    
-    try {
-        // Aquí simularemos devolver el APK desde Netlify
-        // En producción, deberías descargar el archivo real
-        String apkUrl = "https://tconectahost.netlify.app/modules/extension_pagos_servicios-debug.apk";
+    @PostMapping("/download")
+    public ResponseEntity<byte[]> downloadModule(
+            @RequestParam("variant") String variant,
+            @RequestParam("version") String version,
+            @RequestParam("application-id") String applicationId,
+            @RequestParam(value = "features", required = false) String features,
+            @RequestBody(required = false) String deviceSpec) {
         
-        // Por ahora, devolvemos una respuesta simulada
-        // TODO: Implementar descarga real del APK
-        byte[] apkData = "APK_DATA_PLACEHOLDER".getBytes();
+        System.out.println("=== GloballyDynamic Download Request ===");
+        System.out.println("Variant: " + variant);
+        System.out.println("Version: " + version);
+        System.out.println("App ID: " + applicationId);
+        System.out.println("Features: " + features);
+        
+        try {
+            // Mapear features a URLs de Netlify
+            String apkUrl;
+            switch (features != null ? features : "") {
+                case "dynamicfeature":
+                case "dynamicfeature-debug":
+                    apkUrl = "https://tconectahost.netlify.app/modules/dynamicfeature-debug.apk";
+                    break;
+                default:
+                    System.err.println("Feature no encontrado: " + features);
+                    return ResponseEntity.status(404)
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                        .body(("{\"error\": \"Module not found: " + features + "\"}").getBytes());
+            }
+            
+            // Redirigir al APK en Netlify
+            return ResponseEntity.status(302)
+                .header(HttpHeaders.LOCATION, apkUrl)
+                .header(HttpHeaders.CONTENT_TYPE, "application/vnd.android.package-archive")
+                .build();
+                
+        } catch (Exception e) {
+            System.err.println("Error en download: " + e.getMessage());
+            return ResponseEntity.status(500)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(("{\"error\": \"Internal server error\"}").getBytes());
+        }
+    }
+
+    // Endpoint para subir bundles (desarrollo)
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadBundle(@RequestBody(required = false) byte[] bundleData) {
+        System.out.println("=== Upload Bundle Request ===");
+        
+        // Simular upload exitoso
+        String response = """
+            {
+                "status": "success",
+                "message": "Bundle uploaded successfully",
+                "timestamp": "%s"
+            }
+            """.formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         
         return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_TYPE, "application/zip")
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=splits.zip")
-            .body(apkData);
-            
-    } catch (Exception e) {
-        System.err.println("Error en download: " + e.getMessage());
-        return ResponseEntity.status(500).build();
+            .header(HttpHeaders.CONTENT_TYPE, "application/json")
+            .body(response);
     }
-}
 
-// Endpoint para subir bundles (desarrollo)
-@PostMapping("/upload")
-public ResponseEntity<String> uploadBundle(@RequestBody(required = false) byte[] bundleData) {
-    System.out.println("=== Upload Bundle Request ===");
-    
-    // Simular upload exitoso
-    String response = """
-        {
-            "status": "success",
-            "message": "Bundle uploaded successfully",
-            "timestamp": "%s"
-        }
-        """.formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-    
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_TYPE, "application/json")
-        .body(response);
-}
-
-// Endpoint para verificar si el servidor está corriendo
-@GetMapping("/liveness_check")
-public ResponseEntity<String> livenessCheck() {
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_TYPE, "text/plain")
-        .body("OK");
-}
-    
+    // Endpoint para verificar si el servidor está corriendo
+    @GetMapping("/liveness_check")
+    public ResponseEntity<String> livenessCheck() {
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_TYPE, "text/plain")
+            .body("OK");
+    }
 }
